@@ -60,9 +60,9 @@ module "account_hardening_default" {
     provisio_regions = local.provisio_settings
   }
   account_hardening_settings = {
-    aws_account_password_policy = local.aws_account_password_policy
+    aws_account_password_policy          = local.aws_account_password_policy
     s3_account_level_public_access_block = true
-    ebs_encryption = true
+    ebs_encryption                       = true
   }
 }
 
@@ -74,9 +74,9 @@ module "account_hardening_image_factory" {
     provisio_regions      = local.provisio_settings
   }
   account_hardening_settings = {
-    aws_account_password_policy = local.aws_account_password_policy
+    aws_account_password_policy          = local.aws_account_password_policy
     s3_account_level_public_access_block = true
-    ebs_encryption = false # in the image factory account EBS encryption must be of for AMI sharing
+    ebs_encryption                       = false # in the image factory account EBS encryption must be of for AMI sharing
   }
 }
 ```
