@@ -16,13 +16,141 @@ ACAI ACF specification-repo for AWS account hardening.
 
 > **_IMPORTANT:_**  This module requires [ACAI Provisio][acai-provisio-url].
 
-
 <!-- FEATURES -->
 ## Features
 
 * Account Password Policy
 * S3 Block Public Access
 * EBS Default Encryption
+
+<!-- USAGE -->
+## USAGE
+
+### Settings
+
+```hcl
+locals {
+  provisio_settings = {
+    primary_region = "eu-central-1"
+    regions        = [
+      "us-east-2",
+      "eu-north-1"
+    ]
+  }
+  aws_account_password_policy = {
+    minimum_password_length        = 32
+    max_password_age               = 90
+    password_reuse_prevention      = 7
+    require_lowercase_characters   = true
+    require_numbers                = true
+    require_uppercase_characters   = true
+    require_symbols                = true
+    allow_users_to_change_password = true
+  }
+}
+```
+
+### Rendering
+
+```hcl
+module "account_hardening_default" {
+  source = "git::https://github.com/acai-consulting/terraform-aws-acf-account-hardening.git?ref=main"
+
+  provisio_settings = {
+    provisio_regions = local.provisio_settings
+  }
+  account_hardening_settings = {
+    aws_account_password_policy = local.aws_account_password_policy
+    s3_account_level_public_access_block = true
+    ebs_encryption = true
+  }
+}
+
+module "account_hardening_image_factory" {
+  source = "git::https://github.com/acai-consulting/terraform-aws-acf-account-hardening.git?ref=main"
+
+  provisio_settings = {
+    provisio_package_name = "account-hardening-without-ebs"
+    provisio_regions      = local.provisio_settings
+  }
+  account_hardening_settings = {
+    aws_account_password_policy = local.aws_account_password_policy
+    s3_account_level_public_access_block = true
+    ebs_encryption = false # in the image factory account EBS encryption must be of for AMI sharing
+  }
+}
+```
+
+### Assigment to accounts
+
+```hcl
+locals {
+  account_baseline = [
+
+# ----------------------------------------------------------------
+# account-hardening    
+    {
+      deployment_name = "account-hardening"
+      account_scope   = <<EOF
+{
+  "exclude" : {
+    "accountId" : [
+      "123456789012" # Image Factory Account
+    ]
+  }
+}
+      EOF
+      provisio_packages = [
+        "account-hardening"
+      ]
+    }, 
+
+# ----------------------------------------------------------------
+# account-hardening-without-ebs    
+    {
+      deployment_name = "account-hardening-without-ebs"
+      account_scope   = <<EOF
+{
+  "exclude" : "*",
+  "forceInclude" : {
+    "accountId" : [
+      "123456789012" # Image Factory Account
+    ]
+  }
+}
+EOF
+      provisio_packages = [
+        "account-hardening-without-ebs"
+      ]
+    }
+  ]
+}
+```
+
+### Provisioning
+
+```hcl
+# ---------------------------------------------------------------------------------------------------------------------
+# ¦ ACAI PROVOSIO CORE
+# ---------------------------------------------------------------------------------------------------------------------
+module "acai_provisio_core" {
+  source = "git::https://github.com/acai-consulting/terraform-aws-acai-provisio-dev.git?ref=main"
+
+  provisio_baselining_specification = {
+    terraform_version     = "= 1.5.7"
+    provider_aws_version  = "= 5.50"
+    provisio_regions      = local.provisio_settings
+    package_specification = [
+      module.account_hardening_default,
+      module.account_hardening_image_factory
+    ]
+    package_deployment = local.account_baseline
+  }
+  providers = {
+    aws = aws.Act_Baselining
+  }
+}
+```
 
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
