@@ -15,9 +15,9 @@ locals {
       "${var.provisio_settings.provisio_package_name}" = merge(
         {
           "requirements.tf" = templatefile("${path.module}/templates/requirements.tf.tftpl", {
-            terraform_version = ">= 1.3.10",
+            terraform_version    = ">= 1.3.10",
             provider_aws_version = ">= 5.50",
-            non_primary_regions = local.non_primary_regions
+            non_primary_regions  = local.non_primary_regions
           })
           "aws_account_password_policy.tf" = templatefile("${path.module}/templates/aws_account_password_policy.tf.tftpl", {
             primary_region                 = var.provisio_settings.provisio_regions.primary_region
