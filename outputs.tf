@@ -1,4 +1,7 @@
-output "account_id" {
-  description = "account_id"
-  value       = data.aws_caller_identity.this.account_id
+output "provisio_package_name" {
+  value = var.provisio_settings.provisio_package_name
+}
+
+output "provisio_packages" {
+  value = local.provisio_packages
 }
