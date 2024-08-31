@@ -83,14 +83,17 @@ module "account_hardening_image_factory" {
 
 ### Assigment to accounts
 
-Leveraging the [ACAI ACF Account Cache][acai-account-cache-url] and the [account selection query language][acai-account-cache-query-url] convention.
+You need to prcisely assign differnt baselining to different AWS account of your organization?
+
+Leveraging the [ACAI ACF Account Cache][acai-account-cache-url] and the [account selection query language][acai-account-cache-query-url] convention, this is very easy.
 
 ```hcl
 locals {
   account_baseline = [
 
 # ----------------------------------------------------------------
-# account-hardening    
+# account-hardening 
+# this will be applied to all accounts except the Image Factory Account
     {
       deployment_name = "account-hardening"
       account_scope   = <<EOF
@@ -109,6 +112,7 @@ locals {
 
 # ----------------------------------------------------------------
 # account-hardening-without-ebs    
+# this will be applied only to the Image Factory Account
     {
       deployment_name = "account-hardening-without-ebs"
       account_scope   = <<EOF
