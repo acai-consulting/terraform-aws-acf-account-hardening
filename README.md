@@ -83,6 +83,8 @@ module "account_hardening_image_factory" {
 
 ### Assigment to accounts
 
+Leveraging the [ACAI ACF Account Cache][acai-account-cache-url] convention.
+
 ```hcl
 locals {
   account_baseline = [
@@ -209,3 +211,4 @@ See [LICENSE][license-url] for full details.
 [provider-aws-version-shield]: https://img.shields.io/badge/aws-%3E%3D5.50-blue.svg?style=flat&color=blueviolet
 [acai-provisio-url]: https://acai.gmbh/solutions/provisio
 [license-url]: https://github.com/acai-consulting/terraform-aws-acf-org-cloudtrail/tree/main/LICENSE.md
+[acai-account-cache-url]: https://github.com/acai-consulting/terraform-aws-acf-account-cache
