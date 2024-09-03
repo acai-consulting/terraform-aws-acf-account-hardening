@@ -10,7 +10,7 @@ terraform {
 # ---------------------------------------------------------------------------------------------------------------------
 locals {
   non_primary_regions = tolist(setsubtract(var.provisio_settings.provisio_regions.regions, [var.provisio_settings.provisio_regions.primary_region]))
-  provisio_packages = merge(
+  provisio_package_files = merge(
     {
       "requirements.tf" = templatefile("${path.module}/templates/requirements.tf.tftpl", {
         terraform_version    = ">= 1.3.10",
